@@ -1,48 +1,91 @@
-import os
+import argparse
+from pathlib import Path
 
-"""
-Este script cria a estrutura inicial de diretórios e arquivos para um projeto de Ciência de Dados.
-"""
+def create_structure(base_path: Path) -> None:
+    """
+    Creates a standard structure for a data science project.
 
-folders = ['data/raw', 'data/processed', 'data/transformed', 'models', 
-           'notebooks', 'scripts', 'src', 'logs', 'tests']
+    This function creates a series of folders and files commonly used in a data science
+    project. The structure is as follows:
 
-files = ['README.md', 'requirements.txt', '.gitignore', 'src/utils.py', 
-         'src/config.py', 'src/etl', 'scripts/pipeline.py']
+        - data/
+            - raw/
+            - processed/
+            - transformed/
+        - models/
+        - notebooks/
+        - scripts/
+        - src/
+            - etl/
+        - logs/
+        - tests/
 
-base_path = str(input("Caminho do diretório: ").strip())
-base_path = os.path.normpath(base_path)
+    The following files are created:
 
-try:
-    with open('gitignore_template.txt', 'r') as template:
-        gitignore_content = template.read()
+        - README.md
+        - requirements.txt
+        - .gitignore
+        - src/utils.py
+        - src/config.py
+        - scripts/pipeline.py
 
-except FileNotFoundError:
-    print("Erro: Arquivo 'gitignore_template.txt' não encontrado.")
-    exit()
+    :param base_path: The base path where the structure should be created.
+    :type base_path: Path
+    """
+    folders = [
+        'data/raw', 'data/processed', 'data/transformed',
+        'models', 'notebooks', 'scripts', 'src', 'src/etl',
+        'logs', 'tests'
+    ]
 
-try:
-    for folder in folders:
-        folder_path = os.path.join(base_path, folder)
-        os.makedirs(folder_path, exist_ok=True)
-        open(os.path.join(folder_path, '.gitkeep'), 'a').close()
+    files = [
+        'README.md', 'requirements.txt', '.gitignore',
+        'src/utils.py', 'src/config.py', 'scripts/pipeline.py'
+    ]
 
-    for file in files:
-        file_path = os.path.join(base_path, file)
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
-        open(file_path, 'a').close()
+    try:
+        for folder in folders:
+            folder_path = base_path / folder
+            folder_path.mkdir(parents=True, exist_ok=True)
+            print(f"Created folder: {folder_path}")
 
-        if file.endswith('.gitignore') and os.stat(file_path).st_size == 0:
-            with open(file_path, 'w') as f:
-                f.write(gitignore_content)
+        for file in files:
+            file_path = base_path / file
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+            if not file_path.exists():
+                file_path.touch()
+                print(f"File created in {file_path}")
+            else:
+                print(f"File already exists: {file_path}")
 
-    print("Projeto criado com sucesso em:", base_path)
+    except PermissionError:
+        print(f"Permission denied to create the structure in: {base_path}")
+    except Exception as e:
+        print(f"An error has occurred: {str(e)}")
 
-except PermissionError:
-    print(f"Erro: Permissão negada. Não foi possível criar em {base_path}")
-    print("Tente:")
-    print("1. Executar como administrador")
-    print("2. Escolher um diretório diferente")
-    
-except Exception as e:
-    print(f"Ocorreu um erro: {str(e)}")
+def main():
+    """
+    Parses command-line arguments and initiates the creation of a data science project structure.
+
+    This function sets up an argument parser to receive the base path where the project structure
+    should be created. It resolves the given path and calls the `create_structure` function
+    to generate the necessary folders and files.
+
+    Raises:
+        SystemExit: If the arguments are not provided correctly.
+    """
+    parser = argparse.ArgumentParser(
+        description="Creates a default structure for a data science project."
+    )
+    parser.add_argument(
+        "path",
+        type=str,
+        help="The path where the structure will be created."
+    )
+    args = parser.parse_args()
+
+    base_path = Path(args.path).resolve()
+    create_structure(base_path)
+
+if __name__ == "__main__":
+    main()
