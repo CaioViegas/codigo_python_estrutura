@@ -17,6 +17,7 @@ def create_structure(base_path: Path) -> None:
         - scripts/
         - src/
             - etl/
+            - utils/
         - logs/
         - tests/
 
@@ -35,12 +36,12 @@ def create_structure(base_path: Path) -> None:
     folders = [
         'data/raw', 'data/processed', 'data/transformed',
         'configs', 'models', 'notebooks', 'scripts', 'src', 'src/etl',
-        'logs', 'tests'
+        'src/utils', 'logs', 'tests'
     ]
 
     files = [
         'README.md', 'requirements.txt', '.gitignore',
-        'configs/paths.py', 'src/utils.py', 'scripts/pipeline.py'
+        'configs/paths.py', 'scripts/pipeline.py'
     ]
 
     try:
